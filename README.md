@@ -27,7 +27,7 @@
      - Again, another creature comfort implementation. Since our project never left the bread board is wasn't exactly neccessary for us to put this in. It is worth mentioning that the output from the controller should be as high of resolution as possible. So this means you should keep the output signal at 3.3V ptp and simply use extrernal hardware to lower the voltage before inputing into the radio.
 
  4. **Push-To-Talk Circui (PTT)**
-     - Luckily, this is actually already designed and tested for you but due to our project never connecting to a radio, we don't have much documentation of physical testing. Take a look at the [PTT Circuit Information](#Schematic/Ltspice/PTT-circuit) for the details on this.
+     - Luckily, this is actually already designed and tested for you but due to our project never connecting to a radio, we don't have much documentation of physical testing. Take a look at the [PTT Circuit Information](https://github.com/monkeyboyfr3sh/Software-TNC/tree/main/Schematic/Ltspice/PTT-circuit) for the details on this.
 
 ## Quick Notes
 
