@@ -87,7 +87,7 @@ The software is broken into many include files. This keeps the code from being v
   - More debug functionality could probably be instrumented in the code but this is a decent start
 
 # Repo Structure
-- **Documentation:** Simply holds some important information we found when trying to unravel the mess of AX.25. This protocol has many technical definitions but you'll find that the HAM community unfortunately has not stayed very true to this standard. This particular area could use more work but we tried to to do a good job at notating our work and assumptions from reverse engineering some hardware we worked with at the time.
+- **Documentation:** Simply holds some important information we found when trying to unravel the mess of AX.25. This protocol has many technical definitions but you'll find that the HAM community unfortunately has not stayed very true to this standard. This particular area could use more work but we tried to to do a good job at notating our work and assumptions from reverse engineering some hardware we worked with at the time. Also checkout our final paper for details.
 - **Schematic:** Not much here except our LTSpice schematic for the PTT circuit but with more hardware realiztions of future projects, this should fill up easily.
 - **Software:** Being a software TNC, this folder has quite a bit from our experimenting. You'll find a single CUBE project hosted called **MCUTNC**, this is our final software version. It has all the bells and whistles implemented that we were able to come up with. On the side of this you'll see the **Code Playground**. This is basically where we did our prototyping with the different hardware functionalities of the STM controller. This was left in just incase any further protyping may want to be completed. :santa: :peach:
 
@@ -116,6 +116,7 @@ This guide will also step you through the process of creating a simple code to b
 
 Guide Created by Digi-Key: https://www.digikey.com/en/maker/projects/getting-started-with-stm32-introduction-to-stm32cubeide/6a6c60a670c447abb90fd0fd78008697
 
+## About this Repo
 1. This repo is a slimmed version of our original GitHub repo. If anything seems to be missing or is not clear, visit:  https://github.com/MrLordLeon/TNCMCU
     - Keep in mind the other repo was our raw data base when working on the project for a senior design capstone project and has a lot of unecessary or intermediate information
 2. Hopefully this is a good tool for learning about AX.25, KISS, and how to use this protocol. Be sure to checkout some of the appendices in the out design paper as this has detailed information on subsystems as well.
