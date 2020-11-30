@@ -13,9 +13,10 @@
 
  This is a simple diagram breaking down some of the goals we had for the end TNC. Due to the restraints of a shortened semester and COVID-19 some features such as RS-232 and 3.5mm Jack were never fully implemented. I want to take a moment to specifically list somethings that stops this device from being a fully functioning proper TNC.
 
+#### **Quick Information Software Operation & Modes**
 Much of the software has been formatted to allow for queue structures to be implemented as data throughput requirements may need to grow with time. This was done by hosting packet information inside one of two custom datatype we defined as **UART_INPUT** and **PACKET_STRUCT** in AX.25.h. As you'll find, most functions simply operate on these global data packets but it wouldn't be very difficult to change the operation to allow input to data pointers.
 
-This is a look at some of the info you'll find in these data types.
+This is a look at the basic operation of the code.
 ```
 struct UART_INPUT { // For uart info
 	int rx_cnt;
@@ -66,9 +67,11 @@ struct PACKET_STRUCT { // For the inbetween stage
 	bool check_crc;			//indicates weather validating fcs field or creating fcs field
 }global_packet;
 ```
+The software is heavily implemented inside of interrupt services. The benefit of this is that is mostly allows the end-user to develop their homebrew software to run in parallel with the TNC requirements. This won't truly be an option until multi-stage ADC sampling (or some other fix) is implemented due to the ADC constantly being serviced currently. Checkout [Project-Shortcomings](#Project-Shortcomings) point number 1 for more info on this.
+
 
 ----------------------------------
- ## Project Shortcomings
+ ## Project-Shortcomings
  1. **Limited voltage range input**
      - This is probably the biggest issue with out software that prevents this from being a fully functional TNC. As of now the device will only properly read a signal with a ptp of 3.3V, 1.65V centered.
      - The fix is relatively straightforward, the software should become a little smarter and add a couple more modes of receiving. There are likely other methods but this is just a recomendation from the original developer.
