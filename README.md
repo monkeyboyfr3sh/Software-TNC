@@ -22,26 +22,22 @@
          - **(Stage 1) Low Polling Mode** : This will be the default receiving mode for the TNC when no signals are detected and establishes the baseline noise, etc. This should be set to conserve power and only exit this mode when some voltages are coming in.
          - **(Stage 2) Very High Polling Mode** : This will be stage 2 of the analog receiving logic. The callback function should do minimal to achieve as high of sample rate as possible. During this stage, the controller will be establishing the characteristics of the wave, specifically the amplitude of incoming wave, and DC offset. AX.25 packets are preceeded by a string of 0 bits so this would be a great time to lock this info in, but make sure to leave time for the clock to sync in stage 3. After these are done, ensure to update the asin LUT. The gen_asin() function will be a good place to do this.
          - **(Stage 3) RX Logic, Medium Polling Mode** : This is essentially what we have already implemented and will actually decode the message now that the characteristics of the incoming signal have been established. Its worth mentioning we focused on optimizing the callback function to be as minimal as possible to keep poll rates as high as possible. Higher poll rates tends to lend to a more accurate frequency representation of the incoming signal.
- 
  2. **RS-232 Port**
      - It is normal for HAM radio users to plug a TNC via an RS-232 port into a computer. This wouldn't take too much effort to implement as this is mostly a hardware issue.
-
  3. **3.5mm Jack**
      - Again, another creature comfort implementation. Since our project never left the bread board is wasn't exactly neccessary for us to put this in. It is worth mentioning that the output from the controller should be as high of resolution as possible. So this means you should keep the output signal at 3.3V ptp and simply use extrernal hardware to lower the voltage before inputing into the radio.
-
  4. **Push-To-Talk Circuit (PTT)**
      - Luckily, this is actually already designed and tested for you but due to our project never connecting to a radio, we don't have much documentation of physical testing. Take a look at the [PTT Circuit Information](https://github.com/monkeyboyfr3sh/Software-TNC/tree/main/Schematic/Ltspice/PTT-circuit) for the details on this.
 
 ----------------------
 ## Final Notes
 
- This repo is a slimmed version of our original GitHub repo. If anything seems to be missing or is not clear, visit:  https://github.com/MrLordLeon/TNCMCU
-  
-  - Keep in mind the other repo was our raw data base when working on the project for a senior design capstone project and has a lot of unecessary or intermediate information
+  1. This repo is a slimmed version of our original GitHub repo. If anything seems to be missing or is not clear, visit:  https://github.com/MrLordLeon/TNCMCU
+     - Keep in mind the other repo was our raw data base when working on the project for a senior design capstone project and has a lot of unecessary or intermediate information
+  2. Hopefully this is a good tool for learning about AX.25, KISS, and how to use this protocol. Be sure to checkout some of the appendices in the out design paper as this has detailed information on subsystems as well.
 
-  Hopefully this is a good tool for learning about AX.25, KISS, and how to use this protocol. Be sure to checkout some of the appendices in the out design paper as this has detailed information on subsystems as well.
-
-#### **Any further questions can be directed to the following:**
+------------------
+## Any further questions can be directed to the following:
 |Developer|Email|GitHub|
 |----------|--------------------|---------------------------------|
 |David Cain|d.cain2740@gmail.com|https://github.com/monkeyboyfr3sh|
