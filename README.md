@@ -2,16 +2,19 @@
  
  ## Project Description
 
- Open source, purely software TNC that supports AX.25.
+  An open source, software based TNC that supports AX.25. Many features of common TNC's are not built-in but we hope to have shed light on not only how AX.25 actually works butto also enable a future developer to implement desired functionality such as bulletin board, APRS, etc.
 
+#### **Software TNC Demo**
  ![Software TNC Demo](Documentation/Group-Information/Final-Presentation-Test.gif)
  
  This is a demo of the project receiving a KISS packet, sending an AFSK signal and then another TNC is receiving the message! The waveform in the top left is a live viewing of this audio signal. It is a short message so not many data points are captured here.
 
+#### **Software TNC Level 1 Diagram**
  ![Software TNC Level 1 Diagram](Documentation/Diagrams/TNCMCU-Level-1-Diagram-Scaled.png)
 
  This is a simple diagram breaking down some of the goals we had for the end TNC. Due to the restraints of a shortened semester and COVID-19 some features such as RS-232 and 3.5mm Jack were never fully implemented. I want to take a moment to specifically list somethings that stops this device from being a fully functioning proper TNC.
 
+----------------------------------
  ## Project Shortcomings
  1. **Limited voltage range input**
      - This is probably the biggest issue with out software that prevents this from being a fully functional TNC. As of now the device will only properly read a signal with a ptp of 3.3V, 1.65V centered.
@@ -26,11 +29,21 @@
  3. **3.5mm Jack**
      - Again, another creature comfort implementation. Since our project never left the bread board is wasn't exactly neccessary for us to put this in. It is worth mentioning that the output from the controller should be as high of resolution as possible. So this means you should keep the output signal at 3.3V ptp and simply use extrernal hardware to lower the voltage before inputing into the radio.
 
- 4. **Push-To-Talk Circui (PTT)**
+ 4. **Push-To-Talk Circuit (PTT)**
      - Luckily, this is actually already designed and tested for you but due to our project never connecting to a radio, we don't have much documentation of physical testing. Take a look at the [PTT Circuit Information](https://github.com/monkeyboyfr3sh/Software-TNC/tree/main/Schematic/Ltspice/PTT-circuit) for the details on this.
 
-## Quick Notes
+----------------------
+## Final Notes
 
- This is a slimmed version of our original GitHub repo. If anything seems to be missing or is not clear, visit:  https://github.com/MrLordLeon/TNCMCU
+ This repo is a slimmed version of our original GitHub repo. If anything seems to be missing or is not clear, visit:  https://github.com/MrLordLeon/TNCMCU
   
-  - Keep in mind this other version was our raw data base when working on the project for a class and has a lot of unecessary or intermediate information
+  - Keep in mind the other repo was our raw data base when working on the project for a senior design capstone project and has a lot of unecessary or intermediate information
+
+  Hopefully this is a good tool for learning about AX.25, KISS, and how to use this protocol. Be sure to checkout some of the appendices in the out design paper as this has detailed information on subsystems as well.
+
+#### **Any further questions can be directed to the following:**
+|Developer|Email|GitHub|
+|----------|--------------------|---------------------------------|
+|David Cain|d.cain2740@gmail.com|https://github.com/monkeyboyfr3sh|
+|Kobe Keopraseuth|kobekeo@gmail.com|https://github.com/kobekeo24|
+|Kaleb Leon|kalebleon@aol.com|https://github.com/MrLordLeon|
