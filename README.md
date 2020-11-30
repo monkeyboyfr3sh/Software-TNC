@@ -1,5 +1,5 @@
 # Software-TNC
- 
+ -------------------------------
  ## Project Description
 
   An open source, software based TNC that supports AX.25. Many features of common TNC's are not built-in but we hope to have shed light on not only how AX.25 actually works butto also enable a future developer to implement desired functionality such as bulletin board, APRS, etc.
