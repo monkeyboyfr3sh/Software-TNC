@@ -13,6 +13,60 @@
 
  This is a simple diagram breaking down some of the goals we had for the end TNC. Due to the restraints of a shortened semester and COVID-19 some features such as RS-232 and 3.5mm Jack were never fully implemented. I want to take a moment to specifically list somethings that stops this device from being a fully functioning proper TNC.
 
+Much of the software has been formatted to allow for queue structures to be implemented as data throughput requirements may need to grow with time. This was done by hosting packet information inside one of two custom datatype we defined as **UART_INPUT** and **PACKET_STRUCT** in AX.25.h. As you'll find, most functions simply operate on these global data packets but it wouldn't be very difficult to change the operation to allow input to data pointers.
+
+This is a look at some of the info you'll find in these data types.
+```
+struct UART_INPUT { // For uart info
+	int rx_cnt;
+	int received_byte_cnt;
+	int flags;
+	uint8_t input;
+	bool got_packet;
+
+	//HEX Members, includes frame end flags
+	uint8_t HEX_KISS_PACKET[KISS_SIZE_BYTES];//This is the buffer used to hold hex bits from UART
+}UART_packet;
+
+struct PACKET_STRUCT { // For the inbetween stage
+	//AX.25 Members, does not include frame end flags
+	bool AX25_PACKET[AX25_PACKET_MAX];//temporary stores bits received from radio, before formatting into AX.25 format
+
+	//KISS Members, includes frame end flags
+	bool KISS_PACKET[KISS_SIZE];
+
+	/*
+	 * 	Packet Pointers:
+	 * 	Can reference data in either AX.25 packet or KISS packet
+	 */
+	bool *address;			//Pointer to address field in global buffer
+	bool *control;			//Pointer to control field in global buffer
+	bool *PID; 				//Pointer to PID field in global buffer, only present for I frames
+	bool *Info;				//Pointer to info field in global buffer
+	int  Info_Len;			//Length of info field, in bits
+	bool *FCS;				//Pointer to fcs field in global buffer
+	bool i_frame_packet;	//Flag to signal if packet is of type i-frames
+
+	bool got_packet;
+	int byte_cnt;
+
+
+	//count for bit stuffed zeros in each field
+	int stuffed_address;
+	int stuffed_control;
+	int stuffed_PID;
+	int stuffed_Info;
+	int stuffed_FCS;
+
+	int bit_stuffed_zeros;
+
+	//CRC
+	uint16_t crc; 				//crc value after calculating data from PC
+	int crc_count;
+	bool check_crc;			//indicates weather validating fcs field or creating fcs field
+}global_packet;
+```
+
 ----------------------------------
  ## Project Shortcomings
  1. **Limited voltage range input**
