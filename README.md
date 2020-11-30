@@ -16,7 +16,7 @@
 #### **Quick Information Software Operation & Modes**
 Much of the software has been formatted to allow for queue structures to be implemented as data throughput requirements may need to grow with time. This was done by hosting packet information inside one of two custom datatype we defined as **UART_INPUT** and **PACKET_STRUCT** in AX.25.h. As you'll find, most functions simply operate on these global data packets but it wouldn't be very difficult to change the operation to allow input to data pointers.
 
-This is a look at the basic operation of the code.
+This is a look at the structure for these two data types.
 ```
 struct UART_INPUT { // For uart info
 	int rx_cnt;
@@ -67,17 +67,16 @@ struct PACKET_STRUCT { // For the inbetween stage
 	bool check_crc;			//indicates weather validating fcs field or creating fcs field
 }global_packet;
 ```
-The software is heavily implemented inside of interrupt services. The benefit of this is that is mostly allows the end-user to develop their homebrew software to run in parallel with the TNC requirements. This won't truly be an option until multi-stage ADC sampling (or some other fix) is implemented due to the ADC constantly being serviced currently. Checkout [Project-Shortcomings](#Project-Shortcomings) point number 1 for more info on this.
-
+The software is heavily implemented inside of interrupt services. The benefit of this is that is mostly allows the end-user to develop their homebrew software to run in parallel with the TNC requirements still being completed. This won't truly be an option until multi-stage ADC sampling (or some other fix) is implemented due to the ADC very frequently being serviced currently. Checkout [Project-Shortcomings](#Project-Shortcomings) point number 1 for more info on this.
 
 ----------------------------------
  ## Project-Shortcomings
  1. **Limited voltage range input**
      - This is probably the biggest issue with out software that prevents this from being a fully functional TNC. As of now the device will only properly read a signal with a ptp of 3.3V, 1.65V centered.
-     - The fix is relatively straightforward, the software should become a little smarter and add a couple more modes of receiving. There are likely other methods but this is just a recomendation from the original developer.
-         - **(Stage 1) Low Polling Mode** : This will be the default receiving mode for the TNC when no signals are detected and establishes the baseline noise, etc. This should be set to conserve power and only exit this mode when some voltages are coming in.
-         - **(Stage 2) Very High Polling Mode** : This will be stage 2 of the analog receiving logic. The callback function should do minimal to achieve as high of sample rate as possible. During this stage, the controller will be establishing the characteristics of the wave, specifically the amplitude of incoming wave, and DC offset. AX.25 packets are preceeded by a string of 0 bits so this would be a great time to lock this info in, but make sure to leave time for the clock to sync in stage 3. After these are done, ensure to update the asin LUT. The gen_asin() function will be a good place to do this.
-         - **(Stage 3) RX Logic, Medium Polling Mode** : This is essentially what we have already implemented and will actually decode the message now that the characteristics of the incoming signal have been established. Its worth mentioning we focused on optimizing the callback function to be as minimal as possible to keep poll rates as high as possible. Higher poll rates tends to lend to a more accurate frequency representation of the incoming signal.
+     - The fix is relatively straightforward, the software should become a little smarter and add a couple more modes of receiving. There are likely other methods but this is just a recomendation from the original developer. The definition of Low, Medium, and High polling rate are not strict here but the idea is to only sample as much as really needed so the controller can services other parts of software if needed.
+         - **(Stage-1) Low Rate Polling Mode** : This will be the default receiving mode for the TNC when no signals are detected and establishes the baseline noise, etc. This should be set to conserve power and only exit this mode when some voltages are coming in.
+         - **(Stage-2) Very High Rate Polling Mode** : This will be stage 2 of the analog receiving logic. The callback function should do minimal to achieve as high of sample rate as possible. During this stage, the controller will be establishing the characteristics of the wave, specifically the amplitude of incoming wave, and DC offset. AX.25 packets are preceeded by a string of 0 bits so this would be a great time to lock this info in, but make sure to leave time for the clock to sync in stage 3. After these are done, ensure to update the asin LUT. The gen_asin() function will be a good place to do this.
+         - **(Stage-3) RX Logic, Medium Rate Polling Mode** : This is essentially what we have already implemented and will actually decode the message now that the characteristics of the incoming signal have been established. Its worth mentioning we focused on optimizing the callback function to be as minimal as possible to keep poll rates as high as possible. Higher poll rates tends to lend to a more accurate frequency representation of the incoming signal.
  2. **RS-232 Port**
      - It is normal for HAM radio users to plug a TNC via an RS-232 port into a computer. This wouldn't take too much effort to implement as this is mostly a hardware issue.
  3. **3.5mm Jack**
