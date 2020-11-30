@@ -1,0 +1,14 @@
+Change Component Designator: OldDesignator=DS1 NewDesignator=UACT
+Change Component Designator: OldDesignator=DS2 NewDesignator=DS5
+Change Component Designator: OldDesignator=DS3 NewDesignator=VACT
+Change Component Designator: OldDesignator=DS4 NewDesignator=DS6
+Change Component Designator: OldDesignator=DS5 NewDesignator=TACT
+Change Component Designator: OldDesignator=DS6 NewDesignator=DS7
+Change Component Designator: OldDesignator=DS7 NewDesignator=DS4
+Change Net Name : Old Net Name=NetDS1_2 New Net Name=NetR16_1
+Change Net Name : Old Net Name=NetDS2_2 New Net Name=NetDS5_2
+Change Net Name : Old Net Name=NetDS3_2 New Net Name=NetR19_1
+Change Net Name : Old Net Name=NetDS4_2 New Net Name=NetDS6_2
+Change Net Name : Old Net Name=NetDS5_2 New Net Name=NetR23_1
+Change Net Name : Old Net Name=NetDS6_2 New Net Name=NetDS7_2
+Change Net Name : Old Net Name=NetDS7_2 New Net Name=NetDS4_2

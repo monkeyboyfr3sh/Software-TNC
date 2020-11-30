@@ -1,0 +1,285 @@
+/*
+ * interrupt_services.c
+ *
+ *  Created on: Nov 5, 2020
+ *      Author: monke
+ */
+
+#include "interrupt_services.h"
+#include "FreqIO.h"
+#include "AX.25.h"
+
+uint8_t captured_bits_count = 0;	//How many captured bits since last clk sync
+bool clk_sync = false;			//Are we synced with clock
+int measure_val;
+
+uint32_t rising_capture = 0;		// stores the timer tick value of the most recent rising edge
+uint32_t falling_capture = 0;	// stores the timer tick value of the most recent falling edge
+uint32_t capture_difference = 0;
+bool rise_captured = false;		// these are used to ensure that we aren't trying to compute the difference
+bool fall_captured = false;		// before we have captured both a rising and falling edge
+bool signal_edge = RISING_EDGE;	// so we know what edge we are looking for (really, the opposite of the edge that was captured last
+
+bool freq_pin_state_curr = false;
+bool freq_pin_state_last = false;
+
+bool hold_state;
+bool NRZI;
+
+bool process_bit_buffer = false;
+int byteArray[8];
+bool got_flag_start = false;
+bool got_flag_end = false;
+
+//Timer 2 Output Compare Callback
+void Tim2_OC_Callback(){
+	static int save_cnt;
+	static int flag_cnt;
+	bool isFlag = false;
+
+	freq_pin_state_last = hold_state;
+
+	//Check if this is valid data
+	if(clk_sync){
+		NRZI = (freq_pin_state_curr==freq_pin_state_last) ? 1 : 0;
+
+		HAL_GPIO_WritePin(GPIOA,D0_Pin,NRZI);
+
+		//Shift byte array for next comparison
+//		memmove(&byteArray[1],&byteArray[0],7*sizeof(int));
+		for(int i = 7;i>0;i--){
+			byteArray[i] = byteArray[i-1];
+		}
+
+		byteArray[0] = NRZI;
+		//01234567
+		//00000000(byteArray will be filled with 0)
+		//00000000
+		//10000000
+		//11000000
+		//11100000
+		//11110000
+		//11111000
+		//11111100
+		//01111110
+
+
+		//Check if this is the flag
+		for (int i = 0; i < 8; i++) {
+			if(byteArray[i] != AX25TBYTE[i]){
+				isFlag = false;
+				break;
+			}
+			//Got to end of byte array
+			if(i==7){
+				isFlag = true;
+			}
+		}
+		//If this is not a flag, copy the values into the buffer pointer
+		if(isFlag){
+			flag_cnt++;
+
+			//If we have a start flag, this is an end flag
+			if(got_flag_start){
+				got_flag_start = false;
+				got_flag_end = true;
+			}
+
+			//Not sure how many appending flags????????
+			else if(flag_cnt>=FLAG_END_COUNT){
+				//If no start flag has occurred
+				if(!got_flag_start){
+					got_flag_start = true;
+				}
+
+				//Reset flag count
+				flag_cnt = 0;
+			}
+
+			//Reset flag var
+			isFlag = false;
+		}
+
+		else if(got_flag_start){
+			HAL_GPIO_TogglePin(GPIOB,D2_Pin);
+			//Load the processed bit into the buffer
+			save_cnt = loadBitBuffer(NRZI);
+		}
+
+		//Found ending flag, now need to process bit buffer
+		if(got_flag_end){
+			got_flag_end = false;
+			HAL_GPIO_TogglePin(GPIOB,D3_Pin);
+
+			//Disable Interrupts for data processing
+			HAL_TIM_OC_Stop_IT(&htim2, TIM_CHANNEL_1);
+			HAL_TIM_IC_Stop_IT(&htim5, TIM_CHANNEL_1);
+
+			sprintf(uartData, "About to process some data\n");
+			HAL_UART_Transmit(&huart2, uartData, strlen(uartData), 10);
+
+			sprintf(uartData, "bitBuffer:(has %d bits in it)\n",save_cnt);
+			HAL_UART_Transmit(&huart2, uartData, strlen(uartData), 10);
+
+			for(int i = 0;i<save_cnt;i++){
+				sprintf(uartData, "%d\n",readBitBuffer());
+				HAL_UART_Transmit(&huart2, uartData, strlen(uartData), 10);
+			}
+
+			sprintf(uartData, "Done printing bitBuffer\n");
+			HAL_UART_Transmit(&huart2, uartData, strlen(uartData), 10);
+
+			//Buffer will be filled with ending flags, dont want this in ax.25 buffer
+			save_cnt -= (FLAG_SIZE*FLAG_END_COUNT);
+			rxBit_count = save_cnt;
+			memcpy(global_packet.AX25_PACKET,bitBuffer,save_cnt);
+
+			sprintf(uartData, "AX.25 Buffer:(has %d bits in it)\n",rxBit_count);
+			HAL_UART_Transmit(&huart2, uartData, strlen(uartData), 10);
+
+			for(int i = 0;i<rxBit_count;i++){
+				sprintf(uartData, "%d\n",global_packet.AX25_PACKET[i]);
+				HAL_UART_Transmit(&huart2, uartData, strlen(uartData), 10);
+			}
+
+			sprintf(uartData, "Done printing AX.25 buffer\n");
+			HAL_UART_Transmit(&huart2, uartData, strlen(uartData), 10);
+
+			remove_bit_stuffing();
+
+
+			//Receive data
+			receiving_AX25();
+
+			save_cnt = 0;
+
+			//Enable Interrupts since data processing is complete
+			HAL_TIM_OC_Start_IT(&htim2, TIM_CHANNEL_1);
+			HAL_TIM_IC_Start_IT(&htim5, TIM_CHANNEL_1);
+		}
+
+		//Prepare OC for next sample
+		uint32_t this_capture = __HAL_TIM_GET_COMPARE(&htim2, TIM_CHANNEL_1);
+		uint32_t next_sampl = this_capture + bit_sample_period;
+		__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1,next_sampl); // if we have not received a transition to the input capture module, we want to refresh the output compare module with the last known bit period
+	}
+
+	//Clock not syncd
+	else
+	{
+		HAL_GPIO_TogglePin(GPIOA,D1_Pin);
+		got_flag_start = false;
+		got_flag_end = false;
+		flag_cnt = 0;
+	}
+
+	//Inc number of bits since last clock sync
+	captured_bits_count++;
+	if(captured_bits_count >= samp_per_bit * no_clk_max_cnt){
+		clk_sync = false;	//Clock is no longer sync
+	}
+	hold_state = freq_pin_state_curr;
+
+	return;
+}
+void Tim3_IT_Callback() {
+	if (mode) {
+		midbit = false;
+	}
+	//Timer 3 does nothing in RX
+	else {}
+}
+//Timer 5 Input Capture Callback
+void Tim5_IC_Callback(){
+	uint32_t this_capture = 0;		// simply stores either the rising or falling capture, based on which state we are in (avoids duplicate code)
+
+	//Grap pin state for OC timer
+	freq_pin_state_curr = signal_edge;
+
+	//Rising Edge
+	if (signal_edge)
+	{
+		rising_capture = HAL_TIM_ReadCapturedValue(&htim5, TIM_CHANNEL_1); //Time-stamp interrupt
+		signal_edge = FALLING_EDGE;		// look for falling edge on next capture
+		rise_captured = true;
+
+		if (rise_captured && fall_captured)
+		{
+			capture_difference = rising_capture - falling_capture;		// calculate difference
+			this_capture = rising_capture;		// set current sample to rising edge
+		}
+	}
+
+	//Falling edge
+	else
+	{
+		falling_capture = HAL_TIM_ReadCapturedValue(&htim5, TIM_CHANNEL_1);		//Time-stamp interrupt
+		fall_captured = true;
+		signal_edge = RISING_EDGE;		// look for rising edge on next capture
+
+		if (rise_captured && fall_captured)
+		{
+			capture_difference = falling_capture - rising_capture;		// calculate difference
+			this_capture = falling_capture;
+		}
+	}
+
+	//Have now captured the transition period
+	//Can use this to align sampling clock
+	if (rise_captured && fall_captured)
+	{
+		//Check if the transition was a valid transition period to use
+		if(SYMBOL_PERIOD-SYMBOL_MARGIN < capture_difference && capture_difference < SYMBOL_PERIOD+SYMBOL_MARGIN){
+
+			//Predict clock
+			uint32_t next_sampl;
+
+			//If clk was not sync, start sample one period later
+			if(!clk_sync){
+				resetBitBuffer();
+				next_sampl = this_capture + SYMBOL_PERIOD;
+			}
+			//If clk was sync, sample at normal interval
+			else {
+				next_sampl = this_capture + bit_sample_period;
+			}
+			//Prepare OC timer int
+			__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, next_sampl);
+			//Reset roll-over value
+			captured_bits_count = 0;
+
+			//Have now synced with clock
+			clk_sync = true;
+		}
+	}
+}
+
+void init_UART(){
+	HAL_UART_Receive_IT(&huart2, &(UART_packet.input), UART_RX_IT_CNT);
+	UART_packet.flags = 0;
+	UART_packet.got_packet = false;
+	UART_packet.rx_cnt = 0;
+	UART_packet.received_byte_cnt = 0;
+}
+void UART2_Exception_Callback(){
+	HAL_UART_Receive_IT(&huart2, &(UART_packet.input), UART_RX_IT_CNT);//Reset
+	UART_packet.got_packet = false;
+
+	  if(UART_packet.input==0xc0){
+		  UART_packet.flags++;
+	  }
+
+	  *(UART_packet.HEX_KISS_PACKET+UART_packet.rx_cnt) = UART_packet.input;
+	  UART_packet.rx_cnt++;
+
+	  if(UART_packet.flags>=2){
+		  if(!mode){
+			  changeMode = true;
+		  }
+		  UART_packet.flags = 0;
+		  UART_packet.got_packet = true;
+		  UART_packet.received_byte_cnt = UART_packet.rx_cnt;
+		  UART_packet.rx_cnt=0;
+
+	  }
+}

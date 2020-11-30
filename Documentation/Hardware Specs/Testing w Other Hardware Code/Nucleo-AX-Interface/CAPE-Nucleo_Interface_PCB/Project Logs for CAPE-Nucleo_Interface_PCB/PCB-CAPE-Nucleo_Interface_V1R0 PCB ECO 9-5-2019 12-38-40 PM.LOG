@@ -1,0 +1,18 @@
+Added Component: Designator=U5(24SSOP209_M)
+Add component. Clean all parameters for all variants
+Add component (AddParameter): Name = "Manufacturer"; Value = "CML Microcircuits"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Part Number"; Value = "MX614TN"; VariantName = "[No Variations]"
+Added Pin To Net: NetName=M_OSC1 Pin=U5-1
+Added Pin To Net: NetName=M_OSC2 Pin=U5-2
+Added Pin To Net: NetName=TNC_PTT_IRQ Pin=U5-5
+Added Pin To Net: NetName=TNC_PGD Pin=U5-6
+Added Pin To Net: NetName=NetC12_1 Pin=U5-7
+Added Pin To Net: NetName=NetC12_2 Pin=U5-8
+Added Pin To Net: NetName=NetR37_2 Pin=U5-11
+Added Pin To Net: NetName=GND Pin=U5-12
+Added Pin To Net: NetName=NetC13_1 Pin=U5-13
+Added Pin To Net: NetName=GND Pin=U5-14
+Added Pin To Net: NetName=TNC_MTX Pin=U5-17
+Added Pin To Net: NetName=3V3 Pin=U5-18
+Added Pin To Net: NetName=TNC_MRX Pin=U5-19
+Added Member To Class: ClassName=SCH-CAPE-Nucleo_Interface_V1R0 Member=Component U5 MX614TN

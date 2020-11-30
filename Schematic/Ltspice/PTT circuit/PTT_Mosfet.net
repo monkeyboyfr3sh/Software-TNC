@@ -1,0 +1,17 @@
+* C:\Users\13372\Documents\GitHub\TNCMCU\Schematic\Ltspice\PTT circuit\PTT_Mosfet.asc
+M1 Vd N003 0 0 Si7336ADP
+R1 N001 Vd 10k
+V1 N001 0 15
+V2 N002 0 3.3V
+R2 N003 0 10k
+D§led N003 P001 D
+R4 P001 0 1000
+R3 N003 N002 1
+.model D D
+.lib C:\Users\13372\Documents\LTspiceXVII\lib\cmp\standard.dio
+.model NMOS NMOS
+.model PMOS PMOS
+.lib C:\Users\13372\Documents\LTspiceXVII\lib\cmp\standard.mos
+.tran 100ms
+.backanno
+.end

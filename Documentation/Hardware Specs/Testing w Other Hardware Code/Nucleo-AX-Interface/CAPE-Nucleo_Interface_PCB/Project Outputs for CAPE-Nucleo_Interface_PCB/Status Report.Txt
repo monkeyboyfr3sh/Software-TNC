@@ -1,0 +1,12 @@
+Output: NC Drill Files
+Type  : NC Drill
+From  : Project [CAPE-Nucleo_Interface_PCB.PrjPcb]
+   Generated File[PCB-CAPE-Nucleo_Interface_V1R0.TXT]
+   Generated File[PCB-CAPE-Nucleo_Interface_V1R0.LDP]
+   Generated File[PCB-CAPE-Nucleo_Interface_V1R0.DRR]
+
+
+Files Generated   : 3
+Documents Printed : 0
+
+Finished Output Generation At 11:48:05 AM On 9/7/2019

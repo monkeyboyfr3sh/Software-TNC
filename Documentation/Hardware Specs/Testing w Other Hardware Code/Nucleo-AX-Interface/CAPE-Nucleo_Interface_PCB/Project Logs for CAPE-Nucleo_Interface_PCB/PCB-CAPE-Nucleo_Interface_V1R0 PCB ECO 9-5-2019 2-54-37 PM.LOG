@@ -1,0 +1,3 @@
+Removed Pin From Net: NetName=GND Pin=C18-1
+Removed Pin From Net: NetName=3V3 Pin=C18-2
+Removed Member From Class: ClassName=SCH-CAPE-Nucleo_Interface_V1R0 Member=C18
