@@ -107,7 +107,6 @@ The software is broken into many include files. This keeps the code from being v
 
 
 # Final Notes
-## Getting Started
 Follow this guide to install the STM32Cube IDE. This is an IDE created by ST for their boards/processors.
 The STM32Cube IDE is based on ECLIPSE add-ons and GNU C/C++ toolchain and GDB debugger. 
 
