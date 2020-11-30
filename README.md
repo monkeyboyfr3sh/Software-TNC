@@ -4,7 +4,7 @@
 
  Open source, purely software TNC that supports AX.25.
 
- ![](Documentation/Group Information/Final-Presentation-Test.gif)
+ ![](Final-Presentation-Test.gif)
 
 ## Notes
 
