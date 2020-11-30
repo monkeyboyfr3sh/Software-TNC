@@ -13,10 +13,10 @@ This is a simple demo of one TNC receiving a KISS packet, sending an analog AFSK
 
 This is a simple diagram breaking down some of the goals we had for the end TNC. Due to the restraints of a shortened semester and COVID-19 some features such as RS-232 and 3.5mm Jack were never fully implemented. I want to take a moment to specifically list somethings that stops this device from being a fully functioning proper TNC.
 
-## Quick Information Software Operation & Modes
+# Quick Information on Software Operation & Modes
 Much of the software has been formatted to allow for queue structures to be implemented as data throughput requirements may need to grow with time. This was done by hosting packet information inside one of two custom datatype we defined as **UART_INPUT** and **PACKET_STRUCT** in AX.25.h. As you'll find, most functions simply operate on these global data packets but it wouldn't be very difficult to change the operation to allow input to data pointers.
 
-This is a look at the structure for these two data types.
+#### This is a look at the structure for these two data types.
 ```
 struct UART_INPUT { // For uart info
 int rx_cnt;
@@ -67,11 +67,33 @@ int crc_count;
 bool check_crc;			//indicates weather validating fcs field or creating fcs field
 }global_packet;
 ```
-The software is heavily implemented inside of interrupt services. The benefit of this is that is mostly allows the end-user to develop their homebrew software to run in parallel with the TNC requirements still being completed. This won't truly be an option until multi-stage ADC sampling (or some other fix) is implemented due to the ADC very frequently being serviced currently. Checkout [Project-Shortcomings](#Project-Shortcomings) point number 1 for more info on this.
+The software is heavily implemented inside of interrupt services. The benefit of this is that it allows the end-user to develop their homebrew software to run in parallel while the TNC requirements are still being satisfied. This won't truly be an option until multi-stage ADC sampling (or some other fix) is implemented due to the ADC frequently being serviced currently.  Checkout [Project-Shortcomings](#Project-Shortcomings) point number 1 for more info on this.
+
+## Breakdown of include file contents
+The software is broken into many include files. This keeps the code from being very dense and hopefully portrays our thought process when structuring the functionality. This is a brief summary of the purpose for each file.
+- FreqIO.h
+  - This file defines methods for directly controller hardware. Setting hardware mode, timer reload settings, DAC control, etc. are setup here.
+  - This is the lowest level in the hardware control.
+- AX.25.h
+  - This file defines methods for handling data processing of AX.25. These methods **do not** directly control hardware.
+- interrupt_services.h
+  - This file defines methods for handling interrupt callbacks. Interrupt corresponding macro definitions are found here.
+- sine.h
+  - This file defines LUTs for the controller. A sine wave LUT is saved and a arcsin LUT are saved.
+- debug.h
+  - This file defines methods for debugging. These methods mostly consist of print statements.
+  - To enable debug printing, set debug_printing true
+  - To force controller into repeat broadcastmode, set BROADCASTR true
+  - More debug functionality could probably be instrumented in the code but this is a decent start
+
+# Repo Structure
+- **Documentation:** Simply holds some important information we found when trying to unravel the mess of AX.25. This protocol has many technical definitions but you'll find that the HAM community unfortunately has not stayed very true to this standard. This particular area could use more work but we tried to to do a good job at notating our work and assumptions from reverse engineering some hardware we worked with at the time.
+- **Schematic:** Not much here except our LTSpice schematic for the PTT circuit but with more hardware realiztions of future projects, this should fill up easily.
+- **Software:** Being a software TNC, this folder has quite a bit from our experimenting. You'll find a single CUBE project hosted called **MCUTNC**, this is our final software version. It has all the bells and whistles implemented that we were able to come up with. On the side of this you'll see the **Code Playground**. This is basically where we did our prototyping with the different hardware functionalities of the STM controller. This was left in just incase any further protyping may want to be completed.  :santa:
 
 # Project-Shortcomings
 1. **Limited voltage range input**
-    - This is probably the biggest issue with out software that prevents this from being a fully functional TNC. As of now the device will only properly read a signal with a ptp of 3.3V, 1.65V centered.
+    - This is probably the biggest issue with our software that prevents this from being a fully functional TNC. As of now the device will only properly read a signal with a ptp of 3.3V, 1.65V centered.
     - The fix is relatively straightforward, the software should become a little smarter and add a couple more modes of receiving. There are likely other methods but this is just a recomendation from the original developer. The definition of Low, Medium, and High polling rate are not strict here but the idea is to only sample as much as really needed so the controller can services other parts of software if needed.
         - **(Stage-1) Low Rate Polling Mode** : This will be the default receiving mode for the TNC when no signals are detected and establishes the baseline noise, etc. This should be set to conserve power and only exit this mode when some voltages are coming in.
         - **(Stage-2) Very High Rate Polling Mode** : This will be stage 2 of the analog receiving logic. The callback function should do minimal to achieve as high of sample rate as possible. During this stage, the controller will be establishing the characteristics of the wave, specifically the amplitude of incoming wave, and DC offset. AX.25 packets are preceeded by a string of 0 bits so this would be a great time to lock this info in, but make sure to leave time for the clock to sync in stage 3. After these are done, ensure to update the asin LUT. The gen_asin() function will be a good place to do this.
@@ -85,6 +107,14 @@ The software is heavily implemented inside of interrupt services. The benefit of
 
 
 # Final Notes
+## Getting Started
+Follow this guide to install the STM32Cube IDE. This is an IDE created by ST for their boards/processors.
+The STM32Cube IDE is based on ECLIPSE add-ons and GNU C/C++ toolchain and GDB debugger. 
+
+This guide will also step you through the process of creating a simple code to blink the onboard LD2.
+**This project is based the NUCLEO-F446RE. _Porting will need to be done for other MCUs!_**
+
+Guide Created by Digi-Key: https://www.digikey.com/en/maker/projects/getting-started-with-stm32-introduction-to-stm32cubeide/6a6c60a670c447abb90fd0fd78008697
 
 1. This repo is a slimmed version of our original GitHub repo. If anything seems to be missing or is not clear, visit:  https://github.com/MrLordLeon/TNCMCU
     - Keep in mind the other repo was our raw data base when working on the project for a senior design capstone project and has a lot of unecessary or intermediate information
