@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">
-<<<<<<< HEAD
-<refactoring comment="Delete resource &apos;tnc432_1&apos;" deleteContents="true" description="Delete resource &apos;tnc432_1&apos;" element1="/tnc432_1" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1603901948935"/>
-=======
-<refactoring comment="Delete resource &apos;DAC_SINEWAVE&apos;" deleteContents="false" description="Delete resource &apos;DAC_SINEWAVE&apos;" element1="/DAC_SINEWAVE" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1604169503133"/>
->>>>>>> Kaleb_Branch
-</session>
