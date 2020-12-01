@@ -11,7 +11,7 @@ This is a simple demo of one TNC receiving a KISS packet, sending an analog AFSK
 ## Software TNC Level 1 Diagram
 ![Software TNC Level 1 Diagram](Documentation/Diagrams/TNCMCU-Level-1-Diagram-Scaled.png)
 
-This is a simple diagram breaking down some of the goals we had for the end TNC. Due to the restraints of a shortened semester and COVID-19 some features such as RS-232 and 3.5mm Jack were never fully implemented. [Future-Work](#Future-Work) discuesses the parts of the project that should be developed further when building on the software.
+The level 1 diagram gives insight to the basics of how the TNC operates. Hardware required is minimal as the goal was to complete all processing on the ST microcontroller. Notice some hardware is still required for tasks such as PTT line switching, audio output, and a UART bridge to support the microcontroller. Due to the restraints of a shortened semester and COVID-19 some features such as RS-232 and 3.5mm Jack were never fully implemented. [Future-Work](#Future-Work) discuesses the parts of the project that should be developed further when building on the software.
 
 # Quick Information on Software Operation & Modes
 Much of the software has been formatted to allow for queue structures to be implemented as data throughput requirements may need to grow with time. This was done by hosting packet information inside one of two custom datatype we defined as **UART_INPUT** and **PACKET_STRUCT** in AX.25.h. As you'll find, most functions simply operate on these global data packets but it wouldn't be very difficult to change the operation to allow input to data pointers.
