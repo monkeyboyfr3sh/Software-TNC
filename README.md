@@ -11,7 +11,7 @@ This is a simple demo of one TNC receiving a KISS packet, sending an analog AFSK
 ## Software TNC Level 1 Diagram
 ![Software TNC Level 1 Diagram](Documentation/Diagrams/TNCMCU-Level-1-Diagram-Scaled.png)
 
-This is a simple diagram breaking down some of the goals we had for the end TNC. Due to the restraints of a shortened semester and COVID-19 some features such as RS-232 and 3.5mm Jack were never fully implemented. I want to take a moment to specifically list somethings that stops this device from being a fully functioning proper TNC.
+This is a simple diagram breaking down some of the goals we had for the end TNC. Due to the restraints of a shortened semester and COVID-19 some features such as RS-232 and 3.5mm Jack were never fully implemented. [Future-Work](#Future-Work) discuesses the parts of the project that should be developed further when building on the software.
 
 # Quick Information on Software Operation & Modes
 Much of the software has been formatted to allow for queue structures to be implemented as data throughput requirements may need to grow with time. This was done by hosting packet information inside one of two custom datatype we defined as **UART_INPUT** and **PACKET_STRUCT** in AX.25.h. As you'll find, most functions simply operate on these global data packets but it wouldn't be very difficult to change the operation to allow input to data pointers.
@@ -67,7 +67,7 @@ int crc_count;
 bool check_crc;			//indicates weather validating fcs field or creating fcs field
 }global_packet;
 ```
-The software is heavily implemented inside of interrupt services. The benefit of this is that it allows the end-user to develop their homebrew software to run in parallel while the TNC requirements are still being satisfied. This won't truly be an option until multi-stage ADC sampling (or some other fix) is implemented due to the ADC frequently being serviced currently.  Checkout [Project-Shortcomings](#Project-Shortcomings) point number 1 for more info on this.
+The software is heavily implemented inside of interrupt services. The benefit of this is that it allows the end-user to develop their homebrew software to run in parallel while the TNC requirements are still being satisfied. This won't truly be an option until multi-stage ADC sampling (or some other fix) is implemented due to the ADC frequently being serviced currently.  Checkout [Future-Work](#Future-Work) point number 1 for more info on this.
 
 ## Breakdown of include file contents
 The software is broken into many include files. This keeps the code from being very dense and hopefully portrays our thought process when structuring the functionality. This is a brief summary of the purpose for each file.
@@ -91,7 +91,7 @@ The software is broken into many include files. This keeps the code from being v
 - **Schematic:** Not much here except our LTSpice schematic for the PTT circuit but with more hardware realiztions of future projects, this should fill up easily.
 - **Software:** Being a software TNC, this folder has quite a bit from our experimenting. You'll find a single CUBE project hosted called **MCUTNC**, this is our final software version. It has all the bells and whistles implemented that we were able to come up with. On the side of this you'll see the **Code Playground**. This is basically where we did our prototyping with the different hardware functionalities of the STM controller. This was left in just incase any further protyping may want to be completed. :santa: :peach:
 
-# Project-Shortcomings
+# Future-Work
 1. **Limited voltage range input**
     - This is probably the biggest issue with our software that prevents this from being a fully functional TNC. As of now the device will only properly read a signal with a ptp of 3.3V, 1.65V centered.
     - The fix is relatively straightforward, the software should become a little smarter and add a couple more modes of receiving. There are likely other methods but this is just a recomendation from the original developer. The definition of Low, Medium, and High polling rate are not strict here but the idea is to only sample as much as really needed so the controller can services other parts of software if needed.
