@@ -1,7 +1,7 @@
 
 # Project Description
 
-An open source, software based TNC that supports AX.25. Many features of common TNC's are not built-in but we hope to have shed light on not only how AX.25 actually works butto also enable a future developer to implement desired functionality such as bulletin board, APRS, etc.
+An open source, software based TNC that supports AX.25. Many features of common TNC's are not built-in but we hope to have shed light on not only how AX.25 actually works but to also enable a future developer to implement desired functionality such as bulletin board, APRS, etc.
 
 ## Software TNC Demo
 ![Software TNC Demo](Documentation/Group-Information/Final-Presentation-Test.gif)
@@ -81,9 +81,9 @@ The software is broken into many include files. This keeps the code from being v
 - sine.h
   - This file defines LUTs for the controller. A sine wave LUT is saved and a arcsin LUT are saved.
 - debug.h
-  - This file defines methods for debugging. These methods mostly consist of print statements.
+  - This file defines methods for debugging. These methods mostly consists of print statements.
   - To enable debug printing, set debug_printing true
-  - To force controller into repeat broadcastmode, set BROADCASTR true
+  - To force controller into repeat broadcast mode, set BROADCASTR true
   - More debug functionality could probably be instrumented in the code but this is a decent start
 
 # Repo Structure
